@@ -1,0 +1,25 @@
+# ---------------------------------------------------------------
+# Here is a summary of the settings you may configure.
+#
+# the list of worlds to time-sync with real life
+# worlds:
+#   - world
+#
+# the daytime offsets from real life (in ticks) for each world
+# offsets:
+#   world: 0
+#
+# the speed multipliers from real life for each world
+# multipliers:
+#   world: 1.0
+#
+# allow commands to offset world time from real life
+# allow-time-skip-commands: false
+#
+# allow player sleeping to offset world time from real life
+# allow-time-skip-sleeping: false
+# ---------------------------------------------------------------
+
+worlds:
+  - world
+

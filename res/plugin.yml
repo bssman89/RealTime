@@ -1,0 +1,9 @@
+main: me.bizroomba.realtime.RealTimePlugin
+name: RealTime
+version: "1.0"
+api-version: "1.16"
+authors:
+  - Biz_Roomba
+  - Cynadyde
+description: >
+  The world time is synced to real life time.
