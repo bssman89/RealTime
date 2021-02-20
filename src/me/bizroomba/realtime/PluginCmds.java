@@ -51,7 +51,7 @@ public class PluginCmds {
      * @param formatterObjs optional objects to format into the message
      */
     public static void chatMsg(CommandSender receiver, String message, Object... formatterObjs) {
-        receiver.sendMessage(formatMsg("&f[&9Real&6Time&f]&r " + message, formatterObjs));
+        receiver.sendMessage(formatMsg("&f[&bReal&6Time&f]&r " + message, formatterObjs));
     }
 
     /**
@@ -71,7 +71,64 @@ public class PluginCmds {
      * @param formatterObjs optional objects to format into the message
      */
     public static void warningMsg(String message, Object... formatterObjs) {
-        RealTimePlugin.getInstance().getLogger().warning("\\e[0;31m" + formatMsg(message, formatterObjs) + "\\e[0;37m");
+        RealTimePlugin.getInstance().getLogger().warning(formatMsg(message, formatterObjs));
+    }
+
+    /**
+     * Searches the argument list for a pair of double or single quotes.
+     * Any arguments within this pair are joined into a single argument by spaces
+     * and the quotes are removed.
+     *
+     * @param args command arguments
+     * @return quote-aware command arguments
+     */
+    public static String[] asQuoteAwareArgs(String[] args) {
+
+        int startQuoteIdx = -1;
+        int endQuoteIdx = -1;
+        boolean isDoubleQuote = true;
+
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
+            if (startQuoteIdx < 0) {
+
+                if (arg.startsWith("\"")) {
+                    startQuoteIdx = i;
+                }
+                else if (arg.startsWith("'")) {
+                    startQuoteIdx = i;
+                    isDoubleQuote = false;
+                }
+            }
+            if (startQuoteIdx >= 0) {
+
+                if (arg.endsWith("\"") && isDoubleQuote) {
+                    endQuoteIdx = i;
+                    break;
+                }
+                else if (arg.endsWith("'") && !isDoubleQuote) {
+                    endQuoteIdx = i;
+                    break;
+                }
+            }
+        }
+        if (startQuoteIdx < 0 || endQuoteIdx < 0) {
+            return args;
+        }
+        else {
+            List<String> newArgsList = new ArrayList<>();
+            newArgsList.addAll(Arrays.asList(args).subList(0, startQuoteIdx));
+            StringBuilder quotedTerm = new StringBuilder();
+            for (int i = startQuoteIdx; i <= endQuoteIdx; i++) {
+                quotedTerm.append(args[i]);
+                if (i < endQuoteIdx) {
+                    quotedTerm.append(' ');
+                }
+            }
+            newArgsList.add(quotedTerm.substring(1, quotedTerm.length() - 1));
+            newArgsList.addAll(Arrays.asList(args).subList(endQuoteIdx + 1, args.length));
+            return newArgsList.toArray(new String[0]);
+        }
     }
 
     /**
@@ -105,7 +162,7 @@ public class PluginCmds {
                     pluginHelp += "&b/realtime settimeoffset <ticks> [<profile>] &7set the ticks ahead gametime is from rl\n";
                     pluginHelp += "&b/realtime settimespeed <multiplier> [<profile>] &7set the speed multiplier of gametime from rl\n";
                     pluginHelp += "&b/realtime setsyncweather (true|false) [<profile>] &7set whether weather is being synced\n";
-                    pluginHelp += "&b/realtime setweathercity <city> [<profile>] &7set the rl city that weather is synced to\n";
+                    pluginHelp += "&b/realtime setweathercity <\"city...\"> [<profile>] &7set the rl city that weather is synced to\n";
                 }
                 if (sender.hasPermission("realtime.admin")) {
                     pluginHelp += "&b/realtime reloadconfig &7reload the plugin's config, loosing any unsaved changes\n";
@@ -374,12 +431,14 @@ public class PluginCmds {
                 }
             }
             else if (args[0].equalsIgnoreCase("setweathercity")) {
+                String[] cityArgs = asQuoteAwareArgs(args);
+
                 if (!sender.hasPermission("realtime.mod")) {
                     chatMsg(sender, "&cYou don't have permission to do that");
                 }
-                else if (args.length == 2 || args.length == 3) {
-                    String cityName = args[1];
-                    String profileName = args.length == 3 ? args[2] : "default";
+                else if (cityArgs.length >= 2) {
+                    String cityName = cityArgs[1];
+                    String profileName = cityArgs.length == 3 ? cityArgs[2] : "default";
 
                     if (cityName.contains("&") || cityName.contains("?") || cityName.contains("/")) {
                         chatMsg(sender, "&cCity contains invalid characters");
@@ -391,7 +450,7 @@ public class PluginCmds {
                 }
                 else {
                     chatMsg(sender, "&6/realtime setweathercity <city> [<profile>]");
-                    chatMsg(sender, "&6City should be title cased, in the form: <city>[, <country>]");
+                    chatMsg(sender, "&6City should quoted if it contains spaces");
                 }
             }
             else if (args[0].equalsIgnoreCase("reloadconfig")) {
