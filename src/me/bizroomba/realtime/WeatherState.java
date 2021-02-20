@@ -2,6 +2,8 @@ package me.bizroomba.realtime;
 
 import org.bukkit.World;
 
+import java.util.Locale;
+
 /**
  * The possible weather states of a world.
  */
@@ -46,12 +48,14 @@ public enum WeatherState {
      * @return the most likely weather state represented by the text
      */
     public static WeatherState determineFrom(String weatherDescription) {
-        if (weatherDescription.contains("thunder")) {
+        String desc = weatherDescription.toLowerCase();
+        if (desc.contains("thunder")) {
             return THUNDER;
         }
-        else if (weatherDescription.contains("rain")
-                || weatherDescription.contains("shower")
-                || weatherDescription.contains("snow")) {
+        else if (desc.contains("rain")
+                || desc.contains("shower")
+                || desc.contains("drizzle")
+                || desc.contains("snow")) {
             return RAIN;
         }
         else {
