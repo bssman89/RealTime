@@ -100,11 +100,11 @@ public class PluginCmds {
                     pluginHelp += "&b/realtime gettimespeed [<profile>] &7get the speed multiplier of gametime from rl\n";
                     pluginHelp += "&b/realtime getsyncweather [<profile>] &7get whether weather is being synced\n";
                     pluginHelp += "&b/realtime getweathercity [<profile>] &7get the rl city that weather is synced to\n";
-                    pluginHelp += "&b/realtime setsynctime <bool> [<profile>] &7set whether time is being synced\n";
+                    pluginHelp += "&b/realtime setsynctime (true|false) [<profile>] &7set whether time is being synced\n";
                     pluginHelp += "&b/realtime settimezero <datetime> [<profile>] &7set the rl time of gametime 0\n";
                     pluginHelp += "&b/realtime settimeoffset <ticks> [<profile>] &7set the ticks ahead gametime is from rl\n";
                     pluginHelp += "&b/realtime settimespeed <multiplier> [<profile>] &7set the speed multiplier of gametime from rl\n";
-                    pluginHelp += "&b/realtime setsyncweather <bool> [<profile>] &7set whether weather is being synced\n";
+                    pluginHelp += "&b/realtime setsyncweather (true|false) [<profile>] &7set whether weather is being synced\n";
                     pluginHelp += "&b/realtime setweathercity <city> [<profile>] &7set the rl city that weather is synced to\n";
                 }
                 if (sender.hasPermission("realtime.admin")) {
