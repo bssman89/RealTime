@@ -20,7 +20,6 @@ import java.util.Objects;
  */
 public class RealTimePlugin extends JavaPlugin implements Listener {
 
-    boolean debugMode = false;
     Map<String, WeatherState> realLifeWeather = new HashMap<>();
 
     /**
@@ -93,24 +92,6 @@ public class RealTimePlugin extends JavaPlugin implements Listener {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         return PluginCmds.doTabComplete(sender, command, alias, args);
-    }
-
-    /**
-     * Whether or not the plugin should print verbose debug messages or not.
-     *
-     * @return true if debugging is enabled else false
-     */
-    public boolean getDebugMode() {
-        return debugMode;
-    }
-
-    /**
-     * Set whether the plugin should print verbose debug messages or not.
-     *
-     * @param state true if debugging is enabled else false
-     */
-    public void setDebugMode(boolean state) {
-        debugMode = state;
     }
 
     /**

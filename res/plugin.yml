@@ -12,6 +12,8 @@ commands:
   realtime:
     usage: §6/realtime
     description: shows plugin info and a list of sub-commands
+    aliases:
+      - rt
 permissions:
   realtime.*:
     description: grants access to all plugin abilities

@@ -60,8 +60,8 @@ public class PluginCmds {
      * @param message       the debugging message
      * @param formatterObjs optional objects to format into the message
      */
-    public static void debugMsg(String message, Object... formatterObjs) {
-        RealTimePlugin.getInstance().getLogger().info("\\e[0;34m" + formatMsg(message, formatterObjs) + "\\e[0;37m");
+    public static void infoMsg(String message, Object... formatterObjs) {
+        RealTimePlugin.getInstance().getLogger().info(formatMsg(message, formatterObjs));
     }
 
     /**
@@ -90,18 +90,18 @@ public class PluginCmds {
                 pluginHelp += "&d" + info.getWebsite() + "\n";
                 pluginHelp += "&f-------------------------\n";
                 if (sender.hasPermission("realtime.mod")) {
-                    pluginHelp += "&b/realtime syncworld <world> [<profile>] &7begin syncing the chosen world";
-                    pluginHelp += "&b/realtime forgetworld <world> &7stop syncing the chosen world";
-                    pluginHelp += "&b/realtime synctime <bool> [<profile>] &7set whether time is being synced";
-                    pluginHelp += "&b/realtime timezero <datetime> [<profile>] &7set the rl time of gametime 0";
-                    pluginHelp += "&b/realtime timeoffset <ticks> [<profile>] &7set the ticks ahead gametime is from rl";
-                    pluginHelp += "&b/realtime timespeed <multiplier> [<profile>] &7set the speed multiplier of gametime from rl";
-                    pluginHelp += "&b/realtime syncweather <bool> [<profile>] &7set whether weather is being synced";
-                    pluginHelp += "&b/realtime weathercity <city> [<profile>] &7set the rl city that weather is synced to";
+                    pluginHelp += "&b/realtime syncworld <world> [<profile>] &7begin syncing the chosen world\n";
+                    pluginHelp += "&b/realtime forgetworld <world> &7stop syncing the chosen world\n";
+                    pluginHelp += "&b/realtime optsynctime <bool> [<profile>] &7set whether time is being synced\n";
+                    pluginHelp += "&b/realtime opttimezero <datetime> [<profile>] &7set the rl time of gametime 0\n";
+                    pluginHelp += "&b/realtime opttimeoffset <ticks> [<profile>] &7set the ticks ahead gametime is from rl\n";
+                    pluginHelp += "&b/realtime opttimespeed <multiplier> [<profile>] &7set the speed multiplier of gametime from rl\n";
+                    pluginHelp += "&b/realtime optsyncweather <bool> [<profile>] &7set whether weather is being synced\n";
+                    pluginHelp += "&b/realtime optweathercity <city> [<profile>] &7set the rl city that weather is synced to\n";
                 }
                 if (sender.hasPermission("realtime.admin")) {
-                    pluginHelp += "&b/realtime reloadconfig &7reload the plugin's config";
-                    pluginHelp += "&b/realtime toggledebugging &7print a debug message to console";
+                    pluginHelp += "&b/realtime reloadconfig &7reload the plugin's config, loosing any unsaved changes\n";
+                    pluginHelp += "&b/realtime saveconfig &7saves any changes to the plugin's config";
                 }
                 chatMsg(sender, pluginHelp);
             }
@@ -132,7 +132,7 @@ public class PluginCmds {
                     chatMsg(sender, "&6/realtime forgetworld <world>");
                 }
             }
-            else if (args[0].equalsIgnoreCase("synctime")) {
+            else if (args[0].equalsIgnoreCase("optsynctime")) {
                 if (!sender.hasPermission("realtime.mod")) {
                     chatMsg(sender, "&cYou don't have permission to do that");
                 }
@@ -150,10 +150,10 @@ public class PluginCmds {
                     }
                 }
                 else {
-                    chatMsg(sender, "&6/realtime synctime true|false [<profile>]");
+                    chatMsg(sender, "&6/realtime optsynctime true|false [<profile>]");
                 }
             }
-            else if (args[0].equalsIgnoreCase("timezero")) {
+            else if (args[0].equalsIgnoreCase("opttimezero")) {
                 if (!sender.hasPermission("realtime.mod")) {
                     chatMsg(sender, "&cYou don't have permission to do that");
                 }
@@ -180,11 +180,11 @@ public class PluginCmds {
                     }
                 }
                 else {
-                    chatMsg(sender, "&6/realtime timezero <time-zero> [<profile>]");
+                    chatMsg(sender, "&6/realtime opttimezero <time-zero> [<profile>]");
                     chatMsg(sender, "&6Time Zero should be in the ISO date-time format");
                 }
             }
-            else if (args[0].equalsIgnoreCase("timeoffset")) {
+            else if (args[0].equalsIgnoreCase("opttimeoffset")) {
                 if (!sender.hasPermission("realtime.mod")) {
                     chatMsg(sender, "&cYou don't have permission to do that");
                 }
@@ -207,11 +207,11 @@ public class PluginCmds {
                     }
                 }
                 else {
-                    chatMsg(sender, "&6/realtime timeoffset <ticks> [<profile>]");
+                    chatMsg(sender, "&6/realtime opttimeoffset <ticks> [<profile>]");
                     chatMsg(sender, "&6Ticks should be an integer");
                 }
             }
-            else if (args[0].equalsIgnoreCase("timespeed")) {
+            else if (args[0].equalsIgnoreCase("opttimespeed")) {
                 if (!sender.hasPermission("realtime.mod")) {
                     chatMsg(sender, "&cYou don't have permission to do that");
                 }
@@ -238,11 +238,11 @@ public class PluginCmds {
                     }
                 }
                 else {
-                    chatMsg(sender, "&6/realtime timespeed <multiplier> [<profile>]");
+                    chatMsg(sender, "&6/realtime opttimespeed <multiplier> [<profile>]");
                     chatMsg(sender, "&6Multiplier should be a non-zero real number");
                 }
             }
-            else if (args[0].equalsIgnoreCase("syncweather")) {
+            else if (args[0].equalsIgnoreCase("optsyncweather")) {
                 if (!sender.hasPermission("realtime.mod")) {
                     chatMsg(sender, "&cYou don't have permission to do that");
                 }
@@ -260,10 +260,10 @@ public class PluginCmds {
                     }
                 }
                 else {
-                    chatMsg(sender, "&6/realtime syncweather true|false [<profile>]");
+                    chatMsg(sender, "&6/realtime optsyncweather true|false [<profile>]");
                 }
             }
-            else if (args[0].equalsIgnoreCase("weathercity")) {
+            else if (args[0].equalsIgnoreCase("optweathercity")) {
                 if (!sender.hasPermission("realtime.mod")) {
                     chatMsg(sender, "&cYou don't have permission to do that");
                 }
@@ -280,7 +280,7 @@ public class PluginCmds {
                     }
                 }
                 else {
-                    chatMsg(sender, "&6/realtime weathercity <city> [<profile>]");
+                    chatMsg(sender, "&6/realtime optweathercity <city> [<profile>]");
                     chatMsg(sender, "&6City should be title cased, in the form: <city>[, <country>]");
                 }
             }
@@ -296,18 +296,16 @@ public class PluginCmds {
                     chatMsg(sender, "&6/realtime reloadconfig");
                 }
             }
-            else if (args[0].equalsIgnoreCase("toggledebugging")) {
+            else if (args[0].equalsIgnoreCase("saveconfig")) {
                 if (!sender.hasPermission("realtime.admin")) {
                     chatMsg(sender, "&cYou don't have permission to do that");
                 }
                 if (args.length == 1) {
-
-                    plugin.debugMode = !plugin.debugMode;
-
-                    chatMsg(sender, "&aTurned debugging mode " + (plugin.debugMode ? "on" : "off"));
+                    plugin.saveConfig();
+                    chatMsg(sender, "&aSaved the plugin's configuration");
                 }
                 else {
-                    chatMsg(sender, "&6/realtime toggledebugging");
+                    chatMsg(sender, "&6/realtime saveconfig");
                 }
             }
             return true;

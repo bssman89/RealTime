@@ -15,7 +15,6 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
@@ -40,22 +39,10 @@ public class PluginUtils {
 
         for (SettingsProfile profile : plugin.getSettingsProfiles()) {
 
-            if (plugin.debugMode) PluginCmds.debugMsg("syncing worlds for profile: " + profile.getName());
-
             long millis = ChronoUnit.MILLIS.between(profile.getTimeZero(), LocalDateTime.now());
             long rlt = (long) (Math.floor((millis / 1000d) * MC_RL_RATIO) + 18000);
             long gametime = (long) ((profile.getTimeSpeed() * rlt) + profile.getTimeOffset());
             WeatherState weather = RealTimePlugin.getInstance().getRealLifeWeather(profile.getWeatherCity());
-
-            if (plugin.debugMode) {
-                PluginCmds.debugMsg("    time now is: " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                PluginCmds.debugMsg("    time zero is: " + profile.getTimeZero().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                PluginCmds.debugMsg("    seconds since time zero: " + millis);
-                PluginCmds.debugMsg("    real life tick: " + rlt);
-                PluginCmds.debugMsg("    with speed (" + profile.getTimeSpeed() + ") applied: " + (profile.getTimeSpeed() * rlt));
-                PluginCmds.debugMsg("    with speed and offset (" + profile.getTimeOffset() + ") applied: " + gametime);
-                PluginCmds.debugMsg("    the weather for " + profile.getWeatherCity() + " is: " + weather);
-            }
 
             for (World affectedWorld : profile.getAffectedLoadedWorlds()) {
 
@@ -86,7 +73,7 @@ public class PluginUtils {
 
                 plugin.getServer().getScheduler().runTask(plugin, () -> {
 
-                    if (plugin.debugMode) PluginCmds.debugMsg("fetched from api.openweathermap.org and got " + fetchedWeather + " out of " + json);
+                    PluginCmds.infoMsg("fetched api.openweathermap.org and got " + fetchedWeather + " from " + json);
 
                     plugin.realLifeWeather.put(cityName, fetchedWeather);
                 });
@@ -105,9 +92,10 @@ public class PluginUtils {
      */
     private static String requestOpenWeatherMapData(String apiKey, String cityName) {
         RealTimePlugin plugin = RealTimePlugin.getInstance();
+        String protocol = "https://";
         String link = "api.openweathermap.org/data/2.5/weather?q=%s&appid=%s";
         try {
-            URL url = new URL("https://" + String.format(link, cityName, apiKey));
+            URL url = new URL(protocol + String.format(link, cityName, apiKey));
 
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
@@ -131,7 +119,7 @@ public class PluginUtils {
         }
         catch (MalformedURLException ex) {
             plugin.getServer().getScheduler().runTask(plugin, () -> {
-                PluginCmds.warningMsg("The URL was malformed: https://" + String.format(link, cityName, "KEY"));
+                PluginCmds.warningMsg("The URL was malformed: " + protocol + String.format(link, cityName, "*****"));
             });
         }
         catch (IOException ex) {
