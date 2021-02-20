@@ -2,8 +2,6 @@ package me.bizroomba.realtime;
 
 import org.bukkit.World;
 
-import java.util.Locale;
-
 /**
  * The possible weather states of a world.
  */

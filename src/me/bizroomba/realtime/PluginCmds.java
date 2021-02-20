@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
  */
 public class PluginCmds {
 
+    public static final String CHAT_TAG = "&f[&bReal&6Time&f]&r ";
+
     private PluginCmds() {
     }
 
@@ -51,7 +53,25 @@ public class PluginCmds {
      * @param formatterObjs optional objects to format into the message
      */
     public static void chatMsg(CommandSender receiver, String message, Object... formatterObjs) {
-        receiver.sendMessage(formatMsg("&f[&bReal&6Time&f]&r " + message, formatterObjs));
+        receiver.sendMessage(formatMsg(CHAT_TAG + message, formatterObjs));
+    }
+
+    /**
+     * Formats the given message and sends it (with the plugin's chat prefix) to anyone that has the given permission.
+     * If the permission is an empty string, everyone will see the shout.
+     *
+     * @param permission    the permission required to see this shout, or an empty string
+     * @param message       the message with optional ampersand color codes
+     * @param formatterObjs optional objects to format into the message
+     */
+    public static void shoutMsg(String permission, String message, Object... formatterObjs) {
+        if (permission.isEmpty()) {
+            RealTimePlugin.getInstance().getServer().broadcastMessage(CHAT_TAG + formatMsg(message, formatterObjs));
+        }
+        else {
+            RealTimePlugin.getInstance().getServer().broadcast(CHAT_TAG + formatMsg(message, formatterObjs), permission);
+        }
+
     }
 
     /**
@@ -80,6 +100,7 @@ public class PluginCmds {
      * and the quotes are removed.
      *
      * @param args command arguments
+     *
      * @return quote-aware command arguments
      */
     public static String[] asQuoteAwareArgs(String[] args) {
@@ -163,6 +184,8 @@ public class PluginCmds {
                     pluginHelp += "&b/realtime settimespeed <multiplier> [<profile>] &7set the speed multiplier of gametime from rl\n";
                     pluginHelp += "&b/realtime setsyncweather (true|false) [<profile>] &7set whether weather is being synced\n";
                     pluginHelp += "&b/realtime setweathercity <\"city...\"> [<profile>] &7set the rl city that weather is synced to\n";
+                    pluginHelp += "&b/realtime copyprofile <from> <to> &7copies the settings of one profile to another\n";
+                    pluginHelp += "&b/realtime resetprofile <profile> &7deletes all the custom values for a profile\n";
                 }
                 if (sender.hasPermission("realtime.admin")) {
                     pluginHelp += "&b/realtime reloadconfig &7reload the plugin's config, loosing any unsaved changes\n";
@@ -178,7 +201,7 @@ public class PluginCmds {
                     String worldName = args[1];
                     String profileName = args.length == 3 ? args[2] : "default";
                     plugin.setSettingsProfileFor(worldName, profileName);
-                    chatMsg(sender, "&aNow syncing " + worldName);
+                    shoutMsg("realtime.mod", "&aNow syncing " + worldName);
                 }
                 else {
                     chatMsg(sender, "&6/realtime syncworld <world> [<profile>]");
@@ -191,7 +214,7 @@ public class PluginCmds {
                 else if (args.length == 2) {
                     String worldName = args[1];
                     plugin.setSettingsProfileFor(worldName, "");
-                    chatMsg(sender, "&aNo longer syncing " + worldName);
+                    shoutMsg("realtime.mod", "&aNo longer syncing " + worldName);
                 }
                 else {
                     chatMsg(sender, "&6/realtime forgetworld <world>");
@@ -203,7 +226,7 @@ public class PluginCmds {
                 }
                 else if (args.length == 1 || args.length == 2) {
                     String profileName = args.length == 2 ? args[1] : "default";
-                    PluginUtils.syncWorldsToRealLifeInspected(sender);
+                    PluginUtils.syncWorldsToRealLifeInspected(true);
                 }
                 else {
                     chatMsg(sender, "&6/realtime updatetime [<profile>]");
@@ -215,7 +238,7 @@ public class PluginCmds {
                 }
                 else if (args.length == 1 || args.length == 2) {
                     String profileName = args.length == 2 ? args[1] : "default";
-                    PluginUtils.fetchRealLifeWeatherInspected(sender);
+                    PluginUtils.fetchRealLifeWeatherInspected(true);
                 }
                 else {
                     chatMsg(sender, "&6/realtime updateweather [<profile>]");
@@ -228,7 +251,7 @@ public class PluginCmds {
                 else if (args.length == 1 || args.length == 2) {
                     String profileName = args.length == 2 ? args[1] : "default";
                     boolean isSyncTime = plugin.getSettingsProfile(profileName).isSyncTime();
-                    chatMsg(sender, "Got " + profileName + ".sync-time: " + isSyncTime);
+                    chatMsg(sender, "Got settings." + profileName + ".sync-time: " + isSyncTime);
                 }
                 else {
                     chatMsg(sender, "&6/realtime getsynctime [<profile>]");
@@ -241,7 +264,7 @@ public class PluginCmds {
                 else if (args.length == 1 || args.length == 2) {
                     String profileName = args.length == 2 ? args[1] : "default";
                     LocalDateTime timeZero = plugin.getSettingsProfile(profileName).getTimeZero();
-                    chatMsg(sender, "Got " + profileName + ".time-zero: " + timeZero.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                    chatMsg(sender, "Got settings." + profileName + ".time-zero: " + timeZero.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                 }
                 else {
                     chatMsg(sender, "&6/realtime gettimezero [<profile>]");
@@ -254,7 +277,7 @@ public class PluginCmds {
                 else if (args.length == 1 || args.length == 2) {
                     String profileName = args.length == 2 ? args[1] : "default";
                     long offset = plugin.getSettingsProfile(profileName).getTimeOffset();
-                    chatMsg(sender, "Got " + profileName + ".time-offset: " + offset);
+                    chatMsg(sender, "Got settings." + profileName + ".time-offset: " + offset);
                 }
                 else {
                     chatMsg(sender, "&6/realtime gettimeoffset [<profile>]");
@@ -267,7 +290,7 @@ public class PluginCmds {
                 else if (args.length == 1 || args.length == 2) {
                     String profileName = args.length == 2 ? args[1] : "default";
                     double speed = plugin.getSettingsProfile(profileName).getTimeSpeed();
-                    chatMsg(sender, "Got " + profileName + ".time-speed: " + speed);
+                    chatMsg(sender, "Got settings." + profileName + ".time-speed: " + speed);
                 }
                 else {
                     chatMsg(sender, "&6/realtime gettimespeed [<profile>]");
@@ -280,7 +303,7 @@ public class PluginCmds {
                 else if (args.length == 1 || args.length == 2) {
                     String profileName = args.length == 2 ? args[1] : "default";
                     boolean isSyncWeather = plugin.getSettingsProfile(profileName).isSyncWeather();
-                    chatMsg(sender, "Got " + profileName + ".sync-weather: " + isSyncWeather);
+                    chatMsg(sender, "Got settings." + profileName + ".sync-weather: " + isSyncWeather);
                 }
                 else {
                     chatMsg(sender, "&6/realtime getsyncweather [<profile>]");
@@ -293,7 +316,7 @@ public class PluginCmds {
                 else if (args.length == 1 || args.length == 2) {
                     String profileName = args.length == 2 ? args[1] : "default";
                     String cityName = plugin.getSettingsProfile(profileName).getWeatherCity();
-                    chatMsg(sender, "Got " + profileName + ".weather-city: " + cityName);
+                    chatMsg(sender, "Got settings." + profileName + ".weather-city: " + cityName);
                 }
                 else {
                     chatMsg(sender, "&6/realtime getweathercity [<profile>]");
@@ -310,7 +333,7 @@ public class PluginCmds {
                     if (boolName.equalsIgnoreCase("true") || boolName.equalsIgnoreCase("false")) {
                         boolean state = Boolean.parseBoolean(boolName);
                         plugin.getSettingsProfile(profileName).setSyncTime(state);
-                        chatMsg(sender, "&aSet " + profileName + ".sync-time: " + state);
+                        chatMsg(sender, "&aSet settings." + profileName + ".sync-time: " + state);
                     }
                     else {
                         chatMsg(sender, "&cInvalid boolean: " + args[1]);
@@ -343,7 +366,7 @@ public class PluginCmds {
                             break doSetTimeZero;
                         }
                         plugin.getSettingsProfile(profileName).setTimeZero(timeZero);
-                        chatMsg(sender, "&aSet " + profileName + ".time-zero: " + isoTimeZero);
+                        chatMsg(sender, "&aSet settings." + profileName + ".time-zero: " + isoTimeZero);
                     }
                 }
                 else {
@@ -370,7 +393,7 @@ public class PluginCmds {
                             break doSetOffset;
                         }
                         plugin.getSettingsProfile(profileName).setTimeOffset(offset);
-                        chatMsg(sender, "&aSet " + profileName + ".time-offset: " + offsetName);
+                        chatMsg(sender, "&aSet settings." + profileName + ".time-offset: " + offsetName);
                     }
                 }
                 else {
@@ -401,7 +424,7 @@ public class PluginCmds {
                             break doSetSpeed;
                         }
                         plugin.getSettingsProfile(profileName).setTimeSpeed(speed);
-                        chatMsg(sender, "&aSet " + profileName + ".time-speed: " + speedName);
+                        chatMsg(sender, "&aSet settings." + profileName + ".time-speed: " + speedName);
                     }
                 }
                 else {
@@ -420,7 +443,7 @@ public class PluginCmds {
                     if (boolName.equalsIgnoreCase("true") || boolName.equalsIgnoreCase("false")) {
                         boolean state = Boolean.parseBoolean(boolName);
                         plugin.getSettingsProfile(profileName).setSyncWeather(state);
-                        chatMsg(sender, "&aSet " + profileName + ".sync-weather: " + state);
+                        chatMsg(sender, "&aSet settings." + profileName + ".sync-weather: " + state);
                     }
                     else {
                         chatMsg(sender, "&cInvalid boolean: " + args[1]);
@@ -445,12 +468,43 @@ public class PluginCmds {
                     }
                     else {
                         plugin.getSettingsProfile(profileName).setWeatherCity(cityName);
-                        chatMsg(sender, "&aSet " + profileName + ".weather-city: " + cityName);
+                        chatMsg(sender, "&aSet settings." + profileName + ".weather-city: " + cityName);
                     }
                 }
                 else {
                     chatMsg(sender, "&6/realtime setweathercity <city> [<profile>]");
                     chatMsg(sender, "&6City should quoted if it contains spaces");
+                }
+            }
+            else if (args[0].equalsIgnoreCase("copyprofile")) {
+                if (!sender.hasPermission("realtime.mod")) {
+                    chatMsg(sender, "&cYou don't have permission to do that");
+                }
+                else if (args.length == 3) {
+                    String fromProfileName = args[1];
+                    String toProfileName = args[2];
+
+                    RealTimePlugin.getInstance().getSettingsProfile(fromProfileName).copyTo(toProfileName);
+
+                    chatMsg(sender, "&aCopied the settings from " + fromProfileName + " to " + toProfileName);
+                }
+                else {
+                    chatMsg(sender, "&6/realtime copyprofile <from> <to>");
+                }
+            }
+            else if (args[0].equalsIgnoreCase("resetprofile")) {
+                if (!sender.hasPermission("realtime.mod")) {
+                    chatMsg(sender, "&cYou don't have permission to do that");
+                }
+                else if (args.length == 3) {
+                    String profileName = args[1];
+
+                    RealTimePlugin.getInstance().getSettingsProfile(profileName).clear();
+
+                    chatMsg(sender, "&aRemoved custom values for the '" + profileName + "' profile");
+                }
+                else {
+                    chatMsg(sender, "&6/realtime resetprofile <profile>");
                 }
             }
             else if (args[0].equalsIgnoreCase("reloadconfig")) {
@@ -459,7 +513,7 @@ public class PluginCmds {
                 }
                 else if (args.length == 1) {
                     plugin.onRefresh();
-                    chatMsg(sender, "&aReloaded the plugin's configuration");
+                    shoutMsg("realtime.mod", "&aReloaded the plugin's configuration");
                 }
                 else {
                     chatMsg(sender, "&6/realtime reloadconfig");
@@ -471,7 +525,7 @@ public class PluginCmds {
                 }
                 else if (args.length == 1) {
                     plugin.saveConfig();
-                    chatMsg(sender, "&aSaved the plugin's configuration");
+                    shoutMsg("realtime.mod", "&aSaved the plugin's configuration");
                 }
                 else {
                     chatMsg(sender, "&6/realtime saveconfig");
@@ -506,6 +560,8 @@ public class PluginCmds {
                     if ("settimespeed".startsWith(args[0])) options.add("settimespeed");
                     if ("setsyncweather".startsWith(args[0])) options.add("setsyncweather");
                     if ("setweathercity".startsWith(args[0])) options.add("setweathercity");
+                    if ("copyprofile".startsWith(args[0])) options.add("copyprofile");
+                    if ("resetprofile".startsWith(args[0])) options.add("resetprofile");
                 }
                 if (sender.hasPermission("realtime.admin")) {
                     if ("reloadconfig".startsWith(args[0])) options.add("reloadconfig");
@@ -533,7 +589,9 @@ public class PluginCmds {
                             || args[0].equalsIgnoreCase("gettimeoffset")
                             || args[0].equalsIgnoreCase("gettimespeed")
                             || args[0].equalsIgnoreCase("getsyncweather")
-                            || args[0].equalsIgnoreCase("getweathercity")) {
+                            || args[0].equalsIgnoreCase("getweathercity")
+                            || args[0].equalsIgnoreCase("copyprofile")
+                            || args[0].equalsIgnoreCase("resetprofile")) {
                         for (String profileName : RealTimePlugin.getInstance().getSettingsProfileNames()) {
                             if (profileName.startsWith(args[1])) options.add(profileName);
                         }
@@ -547,7 +605,8 @@ public class PluginCmds {
                             || args[0].equalsIgnoreCase("settimeoffset")
                             || args[0].equalsIgnoreCase("settimespeed")
                             || args[0].equalsIgnoreCase("setsyncweather")
-                            || args[0].equalsIgnoreCase("setweathercity")) {
+                            || args[0].equalsIgnoreCase("setweathercity")
+                            || args[0].equalsIgnoreCase("copyprofile")) {
                         for (String profileName : RealTimePlugin.getInstance().getSettingsProfileNames()) {
                             if (profileName.startsWith(args[2])) options.add(profileName);
                         }
