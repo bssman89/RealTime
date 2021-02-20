@@ -1,38 +1,6 @@
 # config.yml generated for RealTime_1.16.5-0
-# below is a description of the default configuration
-# ---------------------------------------------------------------
-# # if true, the config will be autosaved
-# config-autosave: true
-#
-# # the number of ticks between config autosaves (int > 1200)
-# config-autosave-period: 24000
-#
-# # the current weather api key
-# weather-api-key: ""
-#
-# # the affected worlds and their settings profile
-# worlds:
-#   world: default
-#
-# # the number of ticks between weather updates (int > 20)
-# weather-fetch-period: 1200
-#
-# # create or modify the plugin's settings profiles
-# settings:
-#   default:
-#     # whether or not to enable world gametime sync
-#     sync-time: true
-#     # the iso date-time for time zero
-#     time-zero: "1-01-01T00:00:00"
-#     # the daytime offset from real life
-#     time-offset: 0
-#     # the speed multiplier from real life
-#     time-speed: 1.0
-#     # whether or not to enable world weather sync
-#     sync-weather: false
-#     # the zip-code for weather sync
-#     weather-city: ""
-# ---------------------------------------------------------------
+# https://github.com/bssman89/RealTime/wiki/Configuration
+
 config-autosave: true
 config-autosave-period: 24000
 weather-api-key: ""

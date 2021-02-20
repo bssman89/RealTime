@@ -118,7 +118,7 @@ public class RealTimePlugin extends JavaPlugin implements Listener {
      * @return an integer no less than 1200
      */
     public int getConfigAutosavePeriod() {
-        int ticks = getConfig().getInt("config-autosave-period", 1);
+        int ticks = getConfig().getInt("config-autosave-period");
         if (ticks >= 1200) {
             return ticks;
         }
@@ -143,14 +143,14 @@ public class RealTimePlugin extends JavaPlugin implements Listener {
      * Gets the number of ticks between weather syncrhonizations.
      * If this is too often you will max out your api key.
      *
-     * @return an integer no less than 20
+     * @return an integer no less than 1200
      */
     public int getWeatherFetchPeriod() {
-        int ticks = getConfig().getInt("sync-weather-period", 1);
-        if (ticks >= 20) {
+        int ticks = getConfig().getInt("fetch-weather-period");
+        if (ticks >= 1200) {
             return ticks;
         }
-        return 1;
+        return 1200;
     }
 
     /**

@@ -2,6 +2,7 @@ package me.bizroomba.realtime;
 
 import org.bukkit.GameRule;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -35,14 +36,36 @@ public class PluginUtils {
      * Synchronizes the gametime of affected worlds to the system time.
      */
     public static void syncWorldsToRealLife() {
+        syncWorldsToRealLifeInspected(null);
+    }
+
+    /**
+     * Updates the plugin's real-life weather cache using openweathermap.org.
+     */
+    public static void fetchRealLifeWeather() {
+        fetchRealLifeWeatherInspected(null);
+    }
+
+    /**
+     * Synchronizes the gametime of affected worlds to the system time.
+     * The inspector is given information created during the process.
+     *
+     * @param inspector time syncing inspector or null
+     */
+    public static void syncWorldsToRealLifeInspected(CommandSender inspector) {
         RealTimePlugin plugin = RealTimePlugin.getInstance();
 
         for (SettingsProfile profile : plugin.getSettingsProfiles()) {
 
-            long millis = ChronoUnit.MILLIS.between(profile.getTimeZero(), LocalDateTime.now());
+            LocalDateTime now = LocalDateTime.now();
+            long millis = ChronoUnit.MILLIS.between(profile.getTimeZero(), now);
             long rlt = (long) (Math.floor((millis / 1000d) * MC_RL_RATIO) + 18000);
             long gametime = (long) ((profile.getTimeSpeed() * rlt) + profile.getTimeOffset());
             WeatherState weather = RealTimePlugin.getInstance().getRealLifeWeather(profile.getWeatherCity());
+
+            if (inspector != null) {
+                PluginCmds.chatMsg(inspector, "&aRL time is " + now + " (translates to " + rlt + " ticks and " + gametime + " gameticks)");
+            }
 
             for (World affectedWorld : profile.getAffectedLoadedWorlds()) {
 
@@ -59,8 +82,11 @@ public class PluginUtils {
 
     /**
      * Updates the plugin's real-life weather cache using openweathermap.org.
+     * The inspector is given information created during the process.
+     *
+     * @param inspector weather syncing inspector or null
      */
-    public static void fetchRealLifeWeather() {
+    public static void fetchRealLifeWeatherInspected(CommandSender inspector) {
         RealTimePlugin plugin = RealTimePlugin.getInstance();
         String apiKey = plugin.getWeatherApiKey();
 
@@ -73,7 +99,9 @@ public class PluginUtils {
 
                 plugin.getServer().getScheduler().runTask(plugin, () -> {
 
-                    PluginCmds.infoMsg("fetched api.openweathermap.org and got " + fetchedWeather + " from " + json);
+                    if (inspector != null) {
+                        PluginCmds.chatMsg(inspector, "sent request to api.openweathermap.org and got " + fetchedWeather + " from " + json);
+                    }
 
                     plugin.realLifeWeather.put(cityName, fetchedWeather);
                 });
