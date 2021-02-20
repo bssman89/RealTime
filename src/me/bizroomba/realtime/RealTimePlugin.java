@@ -63,19 +63,20 @@ public class RealTimePlugin extends JavaPlugin implements Listener {
         saveDefaultConfig();
         reloadConfig();
 
+        realLifeWeather.clear();
         getServer().getScheduler().cancelTasks(this);
-
-        getServer().getScheduler().runTaskTimer(this, PluginUtils::syncWorldsToRealLife, 1L, 1L);
-
-        if (!getWeatherApiKey().isEmpty()) {
-            int ticks = getWeatherFetchPeriod();
-            getServer().getScheduler().runTaskTimer(this, PluginUtils::fetchRealLifeWeather, ticks, ticks);
-        }
 
         if (isConfigAutosave()) {
             int ticks = getConfigAutosavePeriod();
             getServer().getScheduler().runTaskTimer(this, this::saveConfig, ticks, ticks);
         }
+
+        if (!getWeatherApiKey().isEmpty()) {
+            int ticks = getWeatherFetchPeriod();
+            getServer().getScheduler().runTaskTimer(this, PluginUtils::fetchRealLifeWeather, 0L, ticks);
+        }
+
+        getServer().getScheduler().runTaskTimer(this, PluginUtils::syncWorldsToRealLife, 0L, 1L);
     }
 
     /**

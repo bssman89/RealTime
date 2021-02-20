@@ -53,21 +53,24 @@ public class PluginUtils {
      */
     public static void syncWorldsToRealLifeInspected(boolean inspect) {
         RealTimePlugin plugin = RealTimePlugin.getInstance();
+        LocalDateTime now = LocalDateTime.now();
+
+        if (inspect) PluginCmds.shoutMsg("realtime.mod", "&aSystem time is &e" + now);
 
         for (SettingsProfile profile : plugin.getSettingsProfiles()) {
 
-            LocalDateTime now = LocalDateTime.now();
             long millis = ChronoUnit.MILLIS.between(profile.getTimeZero(), now);
             long rlt = (long) (Math.floor((millis / 1000d) * MC_RL_RATIO) + 18000);
             long gametime = (long) ((profile.getTimeSpeed() * rlt) + profile.getTimeOffset());
 
             String cityName = profile.getWeatherCity();
             WeatherState weather = plugin.getRealLifeWeather(cityName);
-            plugin.realLifeWeather.put(cityName, weather);
 
-            if (inspect) {
-                PluginCmds.shoutMsg("realtime.mod", "&aRL time is " + now + " (translates to " + rlt + " ticks and " + gametime + " gameticks)");
-            }
+            // FIXME DEBUG
+            plugin.getLogger().info("plugin.realLifeWeather.get(" + cityName + ") = WeatherState." + plugin.realLifeWeather.get(cityName));
+
+            if (inspect)
+                PluginCmds.shoutMsg("realtime.mod", "&a%s: &e%s &arlt, &e%s &amct", profile.getName(), rlt, gametime);
 
             for (World affectedWorld : profile.getAffectedLoadedWorlds()) {
 
@@ -91,21 +94,27 @@ public class PluginUtils {
     public static void fetchRealLifeWeatherInspected(boolean inspect) {
         RealTimePlugin plugin = RealTimePlugin.getInstance();
         String apiKey = plugin.getWeatherApiKey();
+        if (apiKey.isEmpty()) {
+            return;
+        }
 
-        for (SettingsProfile profile : RealTimePlugin.getInstance().getSettingsProfiles()) {
+        for (SettingsProfile profile : plugin.getSettingsProfiles()) {
             String cityName = profile.getWeatherCity();
-
+            if (cityName.isEmpty()) {
+                continue;
+            }
             plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
                 String json = requestOpenWeatherMapData(apiKey, cityName);
                 WeatherState fetchedWeather = parseOpenWeatherMapData(json);
 
                 plugin.getServer().getScheduler().runTask(plugin, () -> {
 
-                    if (inspect) {
-                        PluginCmds.shoutMsg("realtime.mod", "sent request to api.openweathermap.org and got " + fetchedWeather + " from " + json);
-                    }
+                    if (inspect) PluginCmds.shoutMsg("realtime.mod", "&a%s: &a%s is &e%s&a, API: '&e%s&a'", profile.getName(), cityName, fetchedWeather, json);
 
                     plugin.realLifeWeather.put(cityName, fetchedWeather);
+
+                    // FIXME DEBUG
+                    plugin.getLogger().info("plugin.realLifeWeather.get(" + cityName + ") = WeatherState." + plugin.realLifeWeather.get(cityName));
                 });
             });
         }
