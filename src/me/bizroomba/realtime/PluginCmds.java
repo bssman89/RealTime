@@ -168,7 +168,7 @@ public class PluginCmds {
                     pluginHelp += "&b/realtime reloadconfig &7reload the plugin's config, loosing any unsaved changes\n";
                     pluginHelp += "&b/realtime saveconfig &7saves any changes to the plugin's config";
                 }
-                chatMsg(sender, pluginHelp);
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', pluginHelp));
             }
             else if (args[0].equalsIgnoreCase("syncworld")) {
                 if (!sender.hasPermission("realtime.mod")) {
