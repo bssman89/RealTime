@@ -66,9 +66,6 @@ public class PluginUtils {
             String cityName = profile.getWeatherCity();
             WeatherState weather = plugin.getRealLifeWeather(cityName);
 
-            // FIXME DEBUG
-            plugin.getLogger().info("plugin.realLifeWeather.get(" + cityName + ") = WeatherState." + plugin.realLifeWeather.get(cityName));
-
             if (inspect)
                 PluginCmds.shoutMsg("realtime.mod", "&a%s: &e%s &arlt, &e%s &amct", profile.getName(), rlt, gametime);
 
@@ -112,9 +109,6 @@ public class PluginUtils {
                     if (inspect) PluginCmds.shoutMsg("realtime.mod", "&a%s: &a%s is &e%s&a, API: '&e%s&a'", profile.getName(), cityName, fetchedWeather, json);
 
                     plugin.realLifeWeather.put(cityName, fetchedWeather);
-
-                    // FIXME DEBUG
-                    plugin.getLogger().info("plugin.realLifeWeather.get(" + cityName + ") = WeatherState." + plugin.realLifeWeather.get(cityName));
                 });
             });
         }
