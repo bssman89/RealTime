@@ -503,7 +503,7 @@ public class PluginCmds {
                 if (!sender.hasPermission("realtime.mod")) {
                     chatMsg(sender, "&cYou don't have permission to do that");
                 }
-                else if (args.length == 3) {
+                else if (args.length == 2) {
                     String profileName = args[1];
 
                     RealTimePlugin.getInstance().getSettingsProfile(profileName).clear();
