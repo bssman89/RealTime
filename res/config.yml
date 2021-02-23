@@ -12,7 +12,7 @@ worlds:
 settings:
   default:
     sync-time: true
-    time-zero: "1-01-01T00:00:00"
+    time-zero: "0001-01-01T00:00:00"
     time-offset: 0
     time-speed: 1.0
     sync-weather: false
